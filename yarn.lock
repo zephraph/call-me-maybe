@@ -1110,6 +1110,13 @@ micro-dev@^3.0.0:
     pretty-error "2.1.1"
     string-length "2.0.0"
 
+micro-query@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/micro-query/-/micro-query-0.3.0.tgz#10bd973d6248379ab5847ab92d3365fc344f309d"
+  integrity sha1-EL2XPWJIN5q1hHq5LTNl/DRPMJ0=
+  dependencies:
+    qs "6.5.2"
+
 micro@^9.3.4:
   version "9.3.4"
   resolved "https://registry.yarnpkg.com/micro/-/micro-9.3.4.tgz#745a494e53c8916f64fb6a729f8cbf2a506b35ad"
@@ -1492,6 +1499,11 @@ pump@^3.0.0:
   dependencies:
     end-of-stream "^1.1.0"
     once "^1.3.1"
+
+qs@6.5.2:
+  version "6.5.2"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
+  integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
 
 raw-body@2.3.2:
   version "2.3.2"
