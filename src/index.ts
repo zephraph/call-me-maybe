@@ -96,4 +96,4 @@ const requestHandler: RequestHandler = async (req, res) => {
   }
 };
 
-exports = requestHandler;
+export default requestHandler;
