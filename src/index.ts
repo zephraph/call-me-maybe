@@ -6,19 +6,17 @@ import query from "micro-query";
 
 let jobs: { [jobName: string]: CronJob } = {};
 
-interface ScheduleParams {
-  id?: string;
-  runAt?: string;
-  runIn?: string;
-  url: string;
-}
+type ScheduleParams = { id?: string; url: string } & (
+  | { runAt: string }
+  | { runIn: string }
+);
 
 function assertIsScheduleParams(params: any): asserts params is ScheduleParams {
   if (!params.url) {
-    throw new Error("/schedule requires `url` param");
+    throw new Error("Requires `url` param");
   }
   if (!params.runAt && !params.runIn) {
-    throw new Error("/schedule requires `runAt` or `runIn` param");
+    throw new Error("Requires `runAt` or `runIn` param");
   }
 }
 
@@ -39,23 +37,21 @@ const run = (id: string, time: Date, task: () => void) => {
       this.stop();
     },
     () => {
-      console.log("stopping...");
       if (jobs[id]) {
-        console.log("Ending job timeout:", jobs[id].lastDate());
         delete jobs[id];
       }
     },
     true
   );
-  console.log("New job timeout:", jobs[id].nextDate());
 };
 
 const schedule = (scheduleParams: object) => {
   assertIsScheduleParams(scheduleParams);
   const id = scheduleParams.id ?? uuid();
-  const target = scheduleParams.runAt
-    ? runAt(scheduleParams.runAt)
-    : runIn(scheduleParams.runIn!);
+  const target =
+    "runAt" in scheduleParams
+      ? runAt(scheduleParams.runAt)
+      : runIn(scheduleParams.runIn!);
   run(id, target, () => {
     console.log(`calling ${scheduleParams.url}`);
   });
@@ -73,23 +69,20 @@ const cancel = (id: unknown) => {
   jobs?.[id]?.stop();
 };
 
+const listJobs = () =>
+  Object.entries(jobs).map(([id, job]) => ({ [id]: job.nextDate() }));
+
 const requestHandler: RequestHandler = async (req, res) => {
   switch (req.method?.toUpperCase()) {
     case "POST":
-      const addedJob = schedule(await json(req));
-      send(res, 200, addedJob);
+      send(res, 200, schedule(await json(req)));
       break;
     case "DELETE":
-      const { id } = query(req);
-      cancel(id);
+      cancel(query<{ id: string }>(req).id);
       send(res, 200);
       break;
     case "GET":
-      send(
-        res,
-        200,
-        Object.entries(jobs).map(([id, job]) => ({ [id]: job.nextDate() }))
-      );
+      send(res, 200, listJobs());
       break;
     default:
       send(res, 404, "Method not supported");
