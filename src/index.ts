@@ -73,6 +73,9 @@ const listJobs = () =>
   Object.entries(jobs).map(([id, job]) => ({ [id]: job.nextDate() }));
 
 const requestHandler: RequestHandler = async (req, res) => {
+  if (req.url === "/health") return send(res, 200, "OK");
+  if (req.url !== "/") return send(res, 404);
+
   switch (req.method?.toUpperCase()) {
     case "POST":
       send(res, 200, schedule(await json(req)));
