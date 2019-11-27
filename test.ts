@@ -9,11 +9,13 @@ function sleep(ms: number) {
 const getServer = () => micro(service);
 const get = (server = getServer()) => request(server).get("/");
 const post = (server = getServer()) => request(server).post("/");
+const del = (server = getServer(), queryParams?: string) =>
+  request(server).delete(queryParams ? `/?${queryParams}` : "/");
 
 test("GET returns empty array if no jobs are queued", () =>
   get().expect(200, []));
 
-test("should return a job if one is queued", async () => {
+test("should post, get, and delete successfully", async () => {
   const server = getServer();
   await post(server)
     .send({ id: 123, runIn: "500 ms", url: "http://localhost" })
@@ -27,4 +29,6 @@ test("should return a job if one is queued", async () => {
     .then(res => {
       expect(res.body[0]).toHaveProperty("123");
     });
+  await del(server, "id=123").expect(200);
+  await get(server).expect(200, []);
 });
