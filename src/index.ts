@@ -78,7 +78,7 @@ const requestHandler: RequestHandler = async (req, res) => {
       send(res, 200, schedule(await json(req)));
       break;
     case "DELETE":
-      cancel(query<{ id: string }>(req).id);
+      cancel(query<{ id?: string }>(req)?.id);
       send(res, 200);
       break;
     case "GET":
